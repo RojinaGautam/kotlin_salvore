@@ -61,7 +61,7 @@ fun MenuScreen() {
     val context = LocalContext.current
     val activity = context as? Activity
 
-    val context = LocalContext.current
+
     val productRepository = remember { ProductRepositoryImpl() }
     val context2 = LocalContext.current
     val productViewModel = remember { ProductViewModel(productRepository) }

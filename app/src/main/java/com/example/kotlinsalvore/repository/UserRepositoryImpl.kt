@@ -3,7 +3,6 @@ package com.example.kotlinsalvore.repository
 import android.content.Context
 import android.content.SharedPreferences
 import com.example.kotlinsalvore.model.UserModel
-import com.google.firebase.auth.FirebaseUser
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
 
@@ -60,14 +59,14 @@ class UserRepositoryImpl : UserRepository {
     ) {
         try {
             loadUsersFromLocal()
-            val user = localUsers.find { it.email == email && it.password == password }
+            val user = localUsers.find { it.email == email }
             
             if (user != null) {
                 currentUser = user
                 saveCurrentUser()
                 callback(true, "Login successful")
             } else {
-                callback(false, "Invalid email or password")
+                callback(false, "Invalid email")
             }
         } catch (e: Exception) {
             callback(false, "Login failed: ${e.message}")
@@ -92,10 +91,11 @@ class UserRepositoryImpl : UserRepository {
             val userId = (localUsers.size + 1).toString()
             val newUser = UserModel(
                 userId = userId,
-                fullName = "User $userId",
                 email = email,
-                password = password,
-                phoneNumber = ""
+                firstName = "User",
+                lastName = userId,
+                gender = "",
+                address = ""
             )
             
             localUsers.add(newUser)
@@ -143,9 +143,11 @@ class UserRepositoryImpl : UserRepository {
                 val user = localUsers[userIndex]
                 
                 // Update user fields
-                data["fullName"]?.let { user.fullName = it.toString() }
+                data["firstName"]?.let { user.firstName = it.toString() }
+                data["lastName"]?.let { user.lastName = it.toString() }
                 data["email"]?.let { user.email = it.toString() }
-                data["phoneNumber"]?.let { user.phoneNumber = it.toString() }
+                data["gender"]?.let { user.gender = it.toString() }
+                data["address"]?.let { user.address = it.toString() }
                 
                 saveUsersToLocal()
                 
@@ -184,10 +186,9 @@ class UserRepositoryImpl : UserRepository {
         }
     }
 
-    override fun getCurrentUser(): FirebaseUser? {
-        // Return null since we're not using Firebase
-        // The app will use the local currentUser instead
-        return null
+    override fun getCurrentUser(): UserModel? {
+        loadCurrentUser()
+        return currentUser
     }
 
     override fun getUserById(

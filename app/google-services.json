@@ -1,13 +1,33 @@
 {
   "project_info": {
-    "project_number": "YOUR_PROJECT_NUMBER",
-    "project_id": "kotlinsalvore",
-    "storage_bucket": "kotlinsalvore.appspot.com"
+    "project_number": "353318387562",
+    "firebase_url": "https://practicep-a6513-default-rtdb.firebaseio.com",
+    "project_id": "practicep-a6513",
+    "storage_bucket": "practicep-a6513.firebasestorage.app"
   },
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:YOUR_PROJECT_NUMBER:android:YOUR_APP_ID",
+        "mobilesdk_app_id": "1:353318387562:android:6351c09ecc034edbdbaf13",
+        "android_client_info": {
+          "package_name": "com.example.firstproject"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyA_nh7ivvFAZDjMnexdNdET0RMamtpoRy4"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:353318387562:android:797f94ea95ea4565dbaf13",
         "android_client_info": {
           "package_name": "com.example.kotlinsalvore"
         }
@@ -15,7 +35,26 @@
       "oauth_client": [],
       "api_key": [
         {
-          "current_key": "YOUR_API_KEY"
+          "current_key": "AIzaSyA_nh7ivvFAZDjMnexdNdET0RMamtpoRy4"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:353318387562:android:383cd38259ed89d0dbaf13",
+        "android_client_info": {
+          "package_name": "com.example.salvorrestaurant"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyA_nh7ivvFAZDjMnexdNdET0RMamtpoRy4"
         }
       ],
       "services": {
@@ -26,4 +65,4 @@
     }
   ],
   "configuration_version": "1"
-} 
+}

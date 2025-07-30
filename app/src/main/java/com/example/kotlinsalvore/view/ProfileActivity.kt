@@ -39,7 +39,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.kotlinsalvore.R
 import com.example.kotlinsalvore.repository.UserRepositoryImpl
-import com.example.kotlinsalvore.repository.UserViewModel
+import com.example.kotlinsalvore.viewmodel.UserViewModel
 import kotlinx.coroutines.launch
 
 class ProfileActivity : ComponentActivity() {
@@ -62,9 +62,11 @@ fun ProfileBody() {
     val userViewModel = remember { UserViewModel(repo) }
 
     // Personal Details State
-    var fullName by remember { mutableStateOf("") }
+    var firstName by remember { mutableStateOf("") }
+    var lastName by remember { mutableStateOf("") }
     var email by remember { mutableStateOf("") }
-    var phoneNumber by remember { mutableStateOf("") }
+    var gender by remember { mutableStateOf("") }
+    var address by remember { mutableStateOf("") }
 
     // Password State
     var currentPassword by remember { mutableStateOf("") }
@@ -80,7 +82,7 @@ fun ProfileBody() {
     var isUpdatingDetails by remember { mutableStateOf(false) }
     var isUpdatingPassword by remember { mutableStateOf(false) }
 
-    val context = LocalContext.current
+
     val activity = context as Activity
     val coroutineScope = rememberCoroutineScope()
     val snackbarHostState = remember { SnackbarHostState() }
@@ -89,8 +91,10 @@ fun ProfileBody() {
     LaunchedEffect(Unit) {
         val sharedPreferences = context.getSharedPreferences("User", Context.MODE_PRIVATE)
         email = sharedPreferences.getString("email", "") ?: ""
-        fullName = sharedPreferences.getString("fullName", "") ?: ""
-        phoneNumber = sharedPreferences.getString("phoneNumber", "") ?: ""
+        firstName = sharedPreferences.getString("firstName", "") ?: ""
+        lastName = sharedPreferences.getString("lastName", "") ?: ""
+        gender = sharedPreferences.getString("gender", "") ?: ""
+        address = sharedPreferences.getString("address", "") ?: ""
     }
 
     // Light red theme colors
@@ -169,7 +173,7 @@ fun ProfileBody() {
                     Spacer(modifier = Modifier.height(12.dp))
 
                     Text(
-                        text = if (fullName.isNotEmpty()) fullName else "User Name",
+                        text = if (firstName.isNotEmpty() || lastName.isNotEmpty()) "$firstName $lastName" else "User Name",
                         fontSize = 20.sp,
                         fontWeight = FontWeight.Bold,
                         color = darkText
@@ -204,13 +208,41 @@ fun ProfileBody() {
 
                     Spacer(modifier = Modifier.height(16.dp))
 
-                    // Full Name field
+                    // First Name field
                     OutlinedTextField(
-                        value = fullName,
-                        onValueChange = { fullName = it },
+                        value = firstName,
+                        onValueChange = { firstName = it },
                         modifier = Modifier.fillMaxWidth(),
-                        label = { Text("Full Name", color = lightText) },
-                        placeholder = { Text("Enter your full name", color = lightText) },
+                        label = { Text("First Name", color = lightText) },
+                        placeholder = { Text("Enter your first name", color = lightText) },
+                        colors = TextFieldDefaults.colors(
+                            focusedContainerColor = Color(0xFFFEF2F2),
+                            focusedIndicatorColor = primaryRed,
+                            unfocusedContainerColor = Color(0xFFFEF2F2),
+                            unfocusedIndicatorColor = Color(0xFFE5E7EB),
+                            focusedTextColor = darkText,
+                            unfocusedTextColor = darkText
+                        ),
+                        shape = RoundedCornerShape(12.dp),
+                        leadingIcon = {
+                            Icon(
+                                Icons.Default.Person,
+                                contentDescription = null,
+                                tint = primaryRed
+                            )
+                        },
+                        enabled = !isUpdatingDetails
+                    )
+
+                    Spacer(modifier = Modifier.height(12.dp))
+
+                    // Last Name field
+                    OutlinedTextField(
+                        value = lastName,
+                        onValueChange = { lastName = it },
+                        modifier = Modifier.fillMaxWidth(),
+                        label = { Text("Last Name", color = lightText) },
+                        placeholder = { Text("Enter your last name", color = lightText) },
                         colors = TextFieldDefaults.colors(
                             focusedContainerColor = Color(0xFFFEF2F2),
                             focusedIndicatorColor = primaryRed,
@@ -263,13 +295,13 @@ fun ProfileBody() {
 
                     Spacer(modifier = Modifier.height(12.dp))
 
-                    // Phone Number field
+                    // Gender field
                     OutlinedTextField(
-                        value = phoneNumber,
-                        onValueChange = { phoneNumber = it },
+                        value = gender,
+                        onValueChange = { gender = it },
                         modifier = Modifier.fillMaxWidth(),
-                        label = { Text("Phone Number", color = lightText) },
-                        placeholder = { Text("Enter your phone number", color = lightText) },
+                        label = { Text("Gender", color = lightText) },
+                        placeholder = { Text("Enter your gender", color = lightText) },
                         colors = TextFieldDefaults.colors(
                             focusedContainerColor = Color(0xFFFEF2F2),
                             focusedIndicatorColor = primaryRed,
@@ -281,14 +313,39 @@ fun ProfileBody() {
                         shape = RoundedCornerShape(12.dp),
                         leadingIcon = {
                             Icon(
-                                Icons.Default.Phone,
+                                Icons.Default.Person,
                                 contentDescription = null,
                                 tint = primaryRed
                             )
                         },
-                        keyboardOptions = KeyboardOptions(
-                            keyboardType = KeyboardType.Phone
+                        enabled = !isUpdatingDetails
+                    )
+
+                    Spacer(modifier = Modifier.height(12.dp))
+
+                    // Address field
+                    OutlinedTextField(
+                        value = address,
+                        onValueChange = { address = it },
+                        modifier = Modifier.fillMaxWidth(),
+                        label = { Text("Address", color = lightText) },
+                        placeholder = { Text("Enter your address", color = lightText) },
+                        colors = TextFieldDefaults.colors(
+                            focusedContainerColor = Color(0xFFFEF2F2),
+                            focusedIndicatorColor = primaryRed,
+                            unfocusedContainerColor = Color(0xFFFEF2F2),
+                            unfocusedIndicatorColor = Color(0xFFE5E7EB),
+                            focusedTextColor = darkText,
+                            unfocusedTextColor = darkText
                         ),
+                        shape = RoundedCornerShape(12.dp),
+                        leadingIcon = {
+                            Icon(
+                                Icons.Default.Person,
+                                contentDescription = null,
+                                tint = primaryRed
+                            )
+                        },
                         enabled = !isUpdatingDetails
                     )
 
@@ -297,7 +354,7 @@ fun ProfileBody() {
                     // Update Details Button
                     Button(
                         onClick = {
-                            if (fullName.isBlank() || email.isBlank() || phoneNumber.isBlank()) {
+                            if (firstName.isBlank() || lastName.isBlank() || email.isBlank() || gender.isBlank() || address.isBlank()) {
                                 coroutineScope.launch {
                                     snackbarHostState.showSnackbar("Please fill in all fields")
                                 }
@@ -307,16 +364,18 @@ fun ProfileBody() {
                             isUpdatingDetails = true
 
                             // Simulate API call - replace with actual implementation
-                            userViewModel.updateUserDetails(fullName, email, phoneNumber) { success, message ->
+                            userViewModel.updateUserDetails(firstName, lastName, email, gender, address) { success, message ->
                                 isUpdatingDetails = false
 
                                 if (success) {
                                     // Save to shared preferences
                                     val sharedPreferences = context.getSharedPreferences("User", Context.MODE_PRIVATE)
                                     val editor = sharedPreferences.edit()
-                                    editor.putString("fullName", fullName)
+                                    editor.putString("firstName", firstName)
+                                    editor.putString("lastName", lastName)
                                     editor.putString("email", email)
-                                    editor.putString("phoneNumber", phoneNumber)
+                                    editor.putString("gender", gender)
+                                    editor.putString("address", address)
                                     editor.apply()
 
                                     Toast.makeText(context, "Details updated successfully!", Toast.LENGTH_SHORT).show()

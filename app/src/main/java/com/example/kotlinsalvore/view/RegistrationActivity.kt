@@ -31,7 +31,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.kotlinsalvore.model.UserModel
 import com.example.kotlinsalvore.repository.UserRepositoryImpl
-import com.example.kotlinsalvore.repository.UserViewModel
+import com.example.kotlinsalvore.viewmodel.UserViewModel
 
 class RegistrationActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -51,7 +51,7 @@ fun RegBody(innerPaddingValues: PaddingValues = PaddingValues(0.dp)) {
     }
     val userViewModel = remember { UserViewModel(repo) }
 
-    val context = LocalContext.current
+
     val activity = context as? Activity
 
     var firstName by remember { mutableStateOf("") }

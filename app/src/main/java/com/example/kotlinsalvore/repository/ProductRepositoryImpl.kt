@@ -53,7 +53,7 @@ class ProductRepositoryImpl : ProductRepository {
         
         // Set next ID to be higher than any existing ID
         nextId = if (localProducts.isNotEmpty()) {
-            localProducts.maxOfOrNull { it.productId.toIntOrNull() ?: 0 } + 1
+            (localProducts.maxOfOrNull { it.productId.toIntOrNull() ?: 0 } ?: 0) + 1
         } else {
             1
         }

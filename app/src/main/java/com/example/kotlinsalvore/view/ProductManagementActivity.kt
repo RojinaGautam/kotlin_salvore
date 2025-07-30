@@ -49,7 +49,7 @@ fun ProductManagementScreen() {
     val context = LocalContext.current
     val activity = context as? Activity
 
-    val context = LocalContext.current
+
     val productRepository = remember { ProductRepositoryImpl() }
     val productViewModel = remember { ProductViewModel(productRepository) }
     

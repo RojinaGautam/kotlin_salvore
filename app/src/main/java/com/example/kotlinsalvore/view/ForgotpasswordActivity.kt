@@ -48,7 +48,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.kotlinsalvore.repository.UserRepositoryImpl
-import com.example.kotlinsalvore.repository.UserViewModel
+import com.example.kotlinsalvore.viewmodel.UserViewModel
 
 class ForgetPasswordActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -68,7 +68,7 @@ fun ForgetPasswordBody() {
     }
     val userViewModel = remember { UserViewModel(repo) }
 
-    val context = LocalContext.current
+
     val activity = context as Activity
 
     var email by remember { mutableStateOf("") }
@@ -175,7 +175,7 @@ fun ForgetPasswordBody() {
 
                                 isLoading = true
 
-                                userViewModel.resetPassword(email) { success, message ->
+                                userViewModel.forgotPassword(email) { success, message ->
                                     isLoading = false
 
                                     if (success) {

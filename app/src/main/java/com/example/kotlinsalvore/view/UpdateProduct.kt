@@ -53,7 +53,6 @@ fun UpdateProductBody() {
     val repo = remember { ProductRepositoryImpl() }
     val viewModel = remember { ProductViewModel(repo) }
 
-    val context = LocalContext.current
     val activity = context as? Activity
 
     val productId : String? = activity?.intent?.getStringExtra("productId")

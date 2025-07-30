@@ -54,8 +54,7 @@ fun AddProductScreen() {
     var isExpanded by remember { mutableStateOf(false) }
     
     val categories = listOf("Seafood", "Appetizers", "Main Course", "Desserts", "Beverages")
-    
-    val context = LocalContext.current
+
     val productRepository = remember { ProductRepositoryImpl() }
     val productViewModel = remember { ProductViewModel(productRepository) }
     

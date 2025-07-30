@@ -1,7 +1,6 @@
 package com.example.kotlinsalvore.repository
 
 import com.example.kotlinsalvore.model.UserModel
-import com.google.firebase.auth.FirebaseUser
 
 interface UserRepository {
     // login
@@ -41,7 +40,7 @@ interface UserRepository {
         email: String, callback: (Boolean, String) -> Unit
     )
 
-    fun getCurrentUser(): FirebaseUser?
+    fun getCurrentUser(): UserModel?
 
     fun getUserById(
         userId: String,

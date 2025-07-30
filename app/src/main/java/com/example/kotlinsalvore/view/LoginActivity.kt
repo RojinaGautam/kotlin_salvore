@@ -35,7 +35,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.kotlinsalvore.R
 import com.example.kotlinsalvore.repository.UserRepositoryImpl
-import com.example.kotlinsalvore.repository.UserViewModel
+import com.example.kotlinsalvore.viewmodel.UserViewModel
 import kotlinx.coroutines.launch
 
 class LoginActivity : ComponentActivity() {
@@ -62,7 +62,7 @@ fun LoginBody() {
     var rememberMe by remember { mutableStateOf(false) }
     var isLoading by remember { mutableStateOf(false) }
 
-    val context = LocalContext.current
+
     val activity = context as Activity
 
     val sharedPreferences = context.getSharedPreferences("User", Context.MODE_PRIVATE)
