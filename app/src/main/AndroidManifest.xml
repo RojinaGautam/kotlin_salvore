@@ -1,0 +1,158 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.READ_MEDIA_IMAGES" />
+
+    <application
+
+        android:allowBackup="true"
+
+        android:dataExtractionRules="@xml/data_extraction_rules"
+
+        android:fullBackupContent="@xml/backup_rules"
+
+        android:icon="@mipmap/ic_launcher"
+
+        android:label="@string/app_name"
+
+        android:supportsRtl="true"
+
+        android:theme="@style/Theme.KotlinSalvore"
+
+        tools:replace="android:fullBackupContent"
+
+        tools:targetApi="31">
+
+        <!-- Launcher Activity -->
+        <activity
+
+            android:name="com.example.kotlinsalvore.view.SplashActivity"
+
+            android:exported="true"
+
+            android:label="@string/title_activity_splash"
+
+            android:theme="@style/Theme.KotlinSalvore">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
+
+        <!-- Other App Activities -->
+        <activity
+
+            android:name="com.example.kotlinsalvore.view.LoginActivity"
+
+            android:exported="true"
+
+            android:label="@string/title_activity_login"
+
+            android:theme="@style/Theme.KotlinSalvore" />
+
+        <activity
+
+            android:name="com.example.kotlinsalvore.view.RegistrationActivity"
+
+            android:exported="true"
+
+            android:label="@string/title_activity_registration"
+
+            android:theme="@style/Theme.KotlinSalvore" />
+
+        <activity
+
+            android:name="com.example.kotlinsalvore.view.DashboardActivity"
+
+            android:exported="true"
+
+            android:label="@string/title_activity_dashboard"
+
+            android:theme="@style/Theme.KotlinSalvore" />
+
+        <activity
+
+            android:name="com.example.kotlinsalvore.view.MenuActivity"
+
+            android:exported="true"
+
+            android:label="@string/title_activity_menu"
+
+            android:theme="@style/Theme.KotlinSalvore" />
+
+        <activity
+
+            android:name="com.example.kotlinsalvore.view.AddproductActivity"
+
+            android:exported="true"
+
+            android:label="@string/title_activity_addproduct"
+
+            android:theme="@style/Theme.KotlinSalvore" />
+
+        <activity
+
+            android:name="com.example.kotlinsalvore.view.ProductManagementActivity"
+
+            android:exported="true"
+
+            android:label="@string/title_activity_product_management"
+
+            android:theme="@style/Theme.KotlinSalvore" />
+
+        <activity
+
+            android:name="com.example.kotlinsalvore.view.UpdateProductActivity"
+
+            android:exported="true"
+
+            android:label="@string/title_activity_update_product"
+
+            android:theme="@style/Theme.KotlinSalvore" />
+
+        <activity
+
+            android:name="com.example.kotlinsalvore.view.ProductDetailsActivity"
+
+            android:exported="true"
+
+            android:label="@string/title_activity_product_detail"
+
+            android:theme="@style/Theme.KotlinSalvore" />
+
+        <activity
+
+            android:name="com.example.kotlinsalvore.view.CheckoutActivity"
+
+            android:exported="true"
+
+            android:label="@string/title_activity_check_out"
+
+            android:theme="@style/Theme.KotlinSalvore" />
+
+        <activity
+
+            android:name="com.example.kotlinsalvore.view.ProfileActivity"
+
+            android:exported="true"
+
+            android:label="@string/title_activity_profile"
+
+            android:theme="@style/Theme.KotlinSalvore" />
+
+        <activity
+
+            android:name="com.example.kotlinsalvore.view.ForgetPasswordActivity"
+
+            android:exported="true"
+
+            android:label="@string/title_activity_forgotpassword"
+
+            android:theme="@style/Theme.KotlinSalvore" />
+    </application>
+
+</manifest>
+

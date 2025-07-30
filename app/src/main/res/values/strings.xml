@@ -1,0 +1,17 @@
+<resources>
+    <string name="app_name">Kotlin Salvore</string>
+    <string name="title_activity_splash">SplashActivity</string>
+    <string name="title_activity_login">LoginActivity</string>
+    <string name="title_activity_registration">RegistrationActivity</string>
+    <string name="title_activity_dashboard">DashboardActivity</string>
+    <string name="title_activity_menu">MenuActivity</string>
+    <string name="title_activity_forgotpassword">ForgetPasswordActivity</string>
+    <string name="title_activity_check_out">CheckoutActivity</string>
+    <string name="title_activity_profile">ProfileActivity</string>
+    <string name="title_activity_addproduct">AddproductActivity</string>
+    <string name="title_activity_product_management">Product Management</string>
+
+    <string name="title_activity_update_product">UpdateProductActivity</string>
+    <string name="title_activity_product_detail">ProductDetailsActivity</string>
+
+</resources>
