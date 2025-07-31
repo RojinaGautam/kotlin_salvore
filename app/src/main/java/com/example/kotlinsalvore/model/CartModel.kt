@@ -15,9 +15,10 @@ data class CartModel(
     fun addItem(product: ProductModel, quantity: Int = 1) {
         val existingItem = items.find { it.productId == product.productId }
         if (existingItem != null) {
-            // Replace the quantity instead of adding to it
-            existingItem.quantity = quantity
+            // Add to existing quantity
+            existingItem.quantity += quantity
         } else {
+            // Add new item with specified quantity
             items.add(CartItem(
                 productId = product.productId,
                 productName = product.productName,
@@ -25,6 +26,24 @@ data class CartModel(
                 productDesc = product.productDesc,
                 image = product.image,
                 quantity = quantity
+            ))
+        }
+    }
+    
+    fun addOneItem(product: ProductModel) {
+        val existingItem = items.find { it.productId == product.productId }
+        if (existingItem != null) {
+            // Replace quantity with 1 instead of adding
+            existingItem.quantity = 1
+        } else {
+            // Add new item with quantity 1
+            items.add(CartItem(
+                productId = product.productId,
+                productName = product.productName,
+                productPrice = product.productPrice,
+                productDesc = product.productDesc,
+                image = product.image,
+                quantity = 1
             ))
         }
     }

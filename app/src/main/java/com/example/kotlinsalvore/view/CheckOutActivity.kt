@@ -156,17 +156,19 @@ fun CheckoutScreen() {
                     containerColor = Color.White
                 ),
                 actions = {
-                    IconButton(
-                        onClick = {
-                            cartViewModel.clearCart()
-                            Toast.makeText(context, "Cart cleared", Toast.LENGTH_SHORT).show()
+                    if (cartItems.isNotEmpty()) {
+                        IconButton(
+                            onClick = {
+                                cartViewModel.clearCart()
+                                Toast.makeText(context, "Cart cleared", Toast.LENGTH_SHORT).show()
+                            }
+                        ) {
+                            Icon(
+                                Icons.Default.Clear,
+                                contentDescription = "Clear Cart",
+                                tint = Color(0xFFD32F2F)
+                            )
                         }
-                    ) {
-                        Icon(
-                            Icons.Default.Clear,
-                            contentDescription = "Clear Cart",
-                            tint = Color.Black
-                        )
                     }
                 }
             )

@@ -250,6 +250,34 @@ class ProductRepositoryImpl : ProductRepository {
         }
     }
     
+    override fun clearAllProducts(callback: (Boolean, String) -> Unit) {
+        try {
+            Log.d("ProductRepositoryImpl", "clearAllProducts called")
+            if (context == null) {
+                Log.e("ProductRepositoryImpl", "Context is null in clearAllProducts!")
+                callback(false, "Context is null. Please set context first.")
+                return
+            }
+            
+            Log.d("ProductRepositoryImpl", "Clearing all products. Current count: ${localProducts.size}")
+            
+            // Clear the local list
+            localProducts.clear()
+            
+            // Reset the next ID
+            nextId = 1
+            
+            // Save empty list to local storage
+            saveProductsToLocal()
+            
+            Log.d("ProductRepositoryImpl", "All products cleared successfully")
+            callback(true, "All products cleared successfully")
+        } catch (e: Exception) {
+            Log.e("ProductRepositoryImpl", "Error clearing all products: ${e.message}", e)
+            callback(false, "Failed to clear all products: ${e.message}")
+        }
+    }
+    
     fun setContext(context: Context) {
         Log.d("ProductRepositoryImpl", "setContext called")
         this.context = context

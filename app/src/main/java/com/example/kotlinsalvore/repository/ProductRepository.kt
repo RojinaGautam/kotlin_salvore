@@ -17,6 +17,8 @@ interface ProductRepository {
         data: MutableMap<String, Any?>,
         callback: (Boolean, String) -> Unit
     )
+    
+    fun clearAllProducts(callback: (Boolean, String) -> Unit)
 
     fun uploadImage(context: Context,imageUri: Uri, callback: (String?) -> Unit)
 

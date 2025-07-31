@@ -21,6 +21,7 @@ import androidx.compose.material.icons.filled.Email
 import androidx.compose.material.icons.filled.Lock
 import androidx.compose.material.icons.filled.Person
 import androidx.compose.material.icons.filled.Phone
+import androidx.compose.material.icons.filled.Logout
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -634,6 +635,75 @@ fun ProfileBody() {
                         }
                         Text(
                             if (isUpdatingPassword) "Updating..." else "Update Password",
+                            fontSize = 14.sp,
+                            fontWeight = FontWeight.SemiBold
+                        )
+                    }
+                }
+            }
+
+            // Logout Section
+            Card(
+                modifier = Modifier.fillMaxWidth(),
+                shape = RoundedCornerShape(16.dp),
+                elevation = CardDefaults.cardElevation(defaultElevation = 4.dp),
+                colors = CardDefaults.cardColors(containerColor = cardBackground)
+            ) {
+                Column(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(24.dp)
+                ) {
+                    Text(
+                        text = "Account",
+                        fontSize = 18.sp,
+                        fontWeight = FontWeight.Bold,
+                        color = darkText
+                    )
+
+                    Spacer(modifier = Modifier.height(16.dp))
+
+                    // Logout Button
+                    Button(
+                        onClick = {
+                            // Clear user data from SharedPreferences
+                            val sharedPreferences = context.getSharedPreferences("User", Context.MODE_PRIVATE)
+                            sharedPreferences.edit().clear().apply()
+                            
+                            // Call logout function
+                            userViewModel.logout { success, message ->
+                                if (success) {
+                                    Toast.makeText(context, "Logged out successfully", Toast.LENGTH_SHORT).show()
+                                    
+                                    // Close the app and go to home screen
+                                    activity.finishAffinity()
+                                    
+                                    // Alternative: You can also use this to go to splash screen
+                                    // val intent = Intent(context, SplashActivity::class.java)
+                                    // intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
+                                    // context.startActivity(intent)
+                                } else {
+                                    Toast.makeText(context, message ?: "Failed to logout", Toast.LENGTH_SHORT).show()
+                                }
+                            }
+                        },
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .height(48.dp),
+                        shape = RoundedCornerShape(12.dp),
+                        colors = ButtonDefaults.buttonColors(
+                            containerColor = Color(0xFFDC2626), // Red color for logout
+                            contentColor = Color.White
+                        )
+                    ) {
+                        Icon(
+                            Icons.Default.Logout,
+                            contentDescription = "Logout",
+                            modifier = Modifier.size(18.dp)
+                        )
+                        Spacer(modifier = Modifier.width(8.dp))
+                        Text(
+                            "Logout",
                             fontSize = 14.sp,
                             fontWeight = FontWeight.SemiBold
                         )

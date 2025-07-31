@@ -64,4 +64,13 @@ class ProductViewModel(val repo: ProductRepository) : ViewModel() {
     ) {
         repo.updateProduct(productId, data, callback)
     }
+    
+    fun clearAllProducts(callback: (Boolean, String) -> Unit) {
+        repo.clearAllProducts { success, message ->
+            if (success) {
+                getAllProduct() // Refresh the list after clearing
+            }
+            callback(success, message)
+        }
+    }
 }

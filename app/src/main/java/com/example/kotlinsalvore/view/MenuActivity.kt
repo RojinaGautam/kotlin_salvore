@@ -20,6 +20,7 @@ import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.Menu
 import androidx.compose.material.icons.filled.Person
 import androidx.compose.material.icons.filled.Refresh
+import androidx.compose.material.icons.filled.Clear
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.runtime.livedata.observeAsState
@@ -83,6 +84,8 @@ fun MenuScreen() {
     val allProducts = productViewModel.allProducts.observeAsState(initial = emptyList())
     val isLoading = productViewModel.isLoading.observeAsState(initial = true)
     
+    var showClearAllDialog by remember { mutableStateOf(false) }
+    
     // Load products when the screen is first displayed
     LaunchedEffect(Unit) {
         productViewModel.getAllProduct()
@@ -107,24 +110,22 @@ fun MenuScreen() {
         MenuItem("5", "Oysters on the Half Shell", "$22.00", "Fresh oysters served with mignonette sauce and lemon wedges.", R.drawable.oyster)
     )
     
-    // Use database products if available, otherwise use fallback
-    val menuItems = if (allProducts.value.isNotEmpty()) {
-        android.util.Log.d("MenuActivity", "Using ${allProducts.value.size} products from database")
-        allProducts.value.mapNotNull { product ->
-            product?.let {
-                MenuItem(
-                    id = it.productId,
-                    name = it.productName,
-                    price = "$${it.productPrice}",
-                    description = it.productDesc,
-                    imageResId = R.drawable.grilledsalmon // Default image, can be enhanced with actual image URLs
-                )
-            }
+    // Combine fallback items with database products
+    val databaseProducts = allProducts.value.mapNotNull { product ->
+        product?.let {
+            MenuItem(
+                id = it.productId,
+                name = it.productName,
+                price = "$${it.productPrice}",
+                description = it.productDesc,
+                imageResId = R.drawable.grilledsalmon // Default image, can be enhanced with actual image URLs
+            )
         }
-    } else {
-        android.util.Log.d("MenuActivity", "No products in database, using fallback items")
-        fallbackMenuItems
     }
+    
+    val menuItems = fallbackMenuItems + databaseProducts
+    
+    android.util.Log.d("MenuActivity", "Total menu items: ${menuItems.size} (${fallbackMenuItems.size} fallback + ${databaseProducts.size} database)")
 
     Scaffold(
         topBar = {
@@ -147,6 +148,17 @@ fun MenuScreen() {
                     }
                 },
                 actions = {
+                    if (allProducts.value.isNotEmpty()) {
+                        IconButton(
+                            onClick = { showClearAllDialog = true }
+                        ) {
+                            Icon(
+                                Icons.Default.Clear,
+                                contentDescription = "Clear All Products",
+                                tint = Color(0xFFD32F2F)
+                            )
+                        }
+                    }
                     IconButton(
                         onClick = {
                             android.util.Log.d("MenuActivity", "Manual refresh clicked")
@@ -157,6 +169,22 @@ fun MenuScreen() {
                             Icons.Default.Refresh,
                             contentDescription = "Refresh",
                             tint = Color.Black
+                        )
+                    }
+                    // Debug button to show database contents
+                    IconButton(
+                        onClick = {
+                            android.util.Log.d("MenuActivity", "Database contents:")
+                            allProducts.value.forEachIndexed { index, product ->
+                                android.util.Log.d("MenuActivity", "Product $index: ${product?.productName} - $${product?.productPrice}")
+                            }
+                            android.widget.Toast.makeText(context, "Database has ${allProducts.value.size} products", android.widget.Toast.LENGTH_SHORT).show()
+                        }
+                    ) {
+                        Icon(
+                            Icons.Default.Person,
+                            contentDescription = "Debug",
+                            tint = Color.Blue
                         )
                     }
                 },
@@ -276,6 +304,39 @@ fun MenuScreen() {
                 )
             }
         }
+    }
+    
+    // Clear All confirmation dialog
+    if (showClearAllDialog) {
+        AlertDialog(
+            onDismissRequest = { showClearAllDialog = false },
+            title = { Text("Clear All Products") },
+            text = { Text("Are you sure you want to delete ALL products? This action cannot be undone and will remove ${allProducts.value.size} products.") },
+            confirmButton = {
+                TextButton(
+                    onClick = {
+                        productViewModel.clearAllProducts { success, message ->
+                            if (success) {
+                                android.widget.Toast.makeText(context, "All products cleared successfully!", android.widget.Toast.LENGTH_SHORT).show()
+                                refreshKey++ // Trigger refresh
+                            } else {
+                                android.widget.Toast.makeText(context, "Failed to clear products: $message", android.widget.Toast.LENGTH_SHORT).show()
+                            }
+                        }
+                        showClearAllDialog = false
+                    }
+                ) {
+                    Text("Clear All", color = Color(0xFFD32F2F))
+                }
+            },
+            dismissButton = {
+                TextButton(
+                    onClick = { showClearAllDialog = false }
+                ) {
+                    Text("Cancel")
+                }
+            }
+        )
     }
 }
 

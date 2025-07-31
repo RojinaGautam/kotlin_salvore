@@ -21,6 +21,7 @@ import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.Menu
 import androidx.compose.material.icons.filled.Person
 import androidx.compose.material.icons.filled.ShoppingCart
+import androidx.compose.material.icons.filled.Login
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -75,11 +76,12 @@ fun DashboardBody() {
                 },
                 actions = {
                     IconButton(onClick = {
-                        Toast.makeText(context, "Cart Clicked!", Toast.LENGTH_SHORT).show()
+                        val intent = Intent(context, LoginActivity::class.java)
+                        context.startActivity(intent)
                     }) {
                         Icon(
-                            Icons.Default.ShoppingCart,
-                            contentDescription = "Shopping Cart",
+                            Icons.Default.Login,
+                            contentDescription = "Login",
                             tint = blackText
                         )
                     }

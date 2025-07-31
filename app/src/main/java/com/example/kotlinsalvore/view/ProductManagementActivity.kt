@@ -18,6 +18,7 @@ import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Edit
+import androidx.compose.material.icons.filled.Clear
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.runtime.livedata.observeAsState
@@ -60,6 +61,7 @@ fun ProductManagementScreen() {
     
     var showDeleteDialog by remember { mutableStateOf(false) }
     var productToDelete by remember { mutableStateOf<ProductModel?>(null) }
+    var showClearAllDialog by remember { mutableStateOf(false) }
     
     LaunchedEffect(Unit) {
         productViewModel.getAllProduct()
@@ -87,7 +89,20 @@ fun ProductManagementScreen() {
                 },
                 colors = TopAppBarDefaults.centerAlignedTopAppBarColors(
                     containerColor = Color.White
-                )
+                ),
+                actions = {
+                    if (allProducts.value.isNotEmpty()) {
+                        IconButton(
+                            onClick = { showClearAllDialog = true }
+                        ) {
+                            Icon(
+                                Icons.Default.Clear,
+                                contentDescription = "Clear All Products",
+                                tint = Color(0xFFD32F2F)
+                            )
+                        }
+                    }
+                }
             )
         },
         floatingActionButton = {
@@ -203,6 +218,39 @@ fun ProductManagementScreen() {
                         showDeleteDialog = false
                         productToDelete = null
                     }
+                ) {
+                    Text("Cancel")
+                }
+            }
+        )
+    }
+    
+    // Clear All confirmation dialog
+    if (showClearAllDialog) {
+        AlertDialog(
+            onDismissRequest = { showClearAllDialog = false },
+            title = { Text("Clear All Products") },
+            text = { Text("Are you sure you want to delete ALL products? This action cannot be undone and will remove ${allProducts.value.size} products.") },
+            confirmButton = {
+                TextButton(
+                    onClick = {
+                        // Use the new clearAllProducts method
+                        productViewModel.clearAllProducts { success, message ->
+                            if (success) {
+                                Toast.makeText(context, "All products cleared successfully!", Toast.LENGTH_SHORT).show()
+                            } else {
+                                Toast.makeText(context, "Failed to clear products: $message", Toast.LENGTH_SHORT).show()
+                            }
+                        }
+                        showClearAllDialog = false
+                    }
+                ) {
+                    Text("Clear All", color = Color(0xFFD32F2F))
+                }
+            },
+            dismissButton = {
+                TextButton(
+                    onClick = { showClearAllDialog = false }
                 ) {
                     Text("Cancel")
                 }

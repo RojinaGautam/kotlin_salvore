@@ -57,7 +57,8 @@ class CartRepositoryImpl : CartRepository {
             Log.d("CartRepositoryImpl", "Adding ${product.productName} to cart with quantity $quantity")
             Log.d("CartRepositoryImpl", "Cart before adding: ${cart.items.size} items")
             
-            cart.addItem(product, quantity)
+            // Use addOneItem to always add exactly one item regardless of quantity selected
+            cart.addOneItem(product)
             
             Log.d("CartRepositoryImpl", "Cart after adding: ${cart.items.size} items")
             Log.d("CartRepositoryImpl", "Items in cart:")
