@@ -170,6 +170,7 @@ fun ProductDetailsScreen(
                         onClick = {
                             // Debug: Log the quantity being added
                             android.util.Log.d("ProductDetailActivity", "Adding to cart - Quantity: $quantity")
+                            android.util.Log.d("ProductDetailActivity", "Item details - Name: $itemName, ID: $itemId, Price: $itemPrice")
                             
                             // Create a ProductModel from the item data
                             val price = itemPrice.replace("$", "").toDoubleOrNull() ?: 0.0
@@ -180,6 +181,8 @@ fun ProductDetailsScreen(
                                 productDesc = itemDescription,
                                 image = ""
                             )
+                            
+                            android.util.Log.d("ProductDetailActivity", "Created ProductModel: ${product.productName} (ID: ${product.productId}) with price: ${product.productPrice}")
                             
                             // Add to cart
                             cartViewModel.addToCart(product, quantity)

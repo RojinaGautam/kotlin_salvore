@@ -19,11 +19,16 @@ class CartRepositoryImpl : CartRepository {
     }
     
     private fun saveCartToLocal() {
+        val json = gson.toJson(cart)
+        Log.d("CartRepositoryImpl", "Saving cart to JSON: $json")
         getSharedPreferences()?.edit()?.apply {
-            putString(cartKey, gson.toJson(cart))
+            putString(cartKey, json)
             apply()
         }
         Log.d("CartRepositoryImpl", "Cart saved to local storage. Items: ${cart.items.size}")
+        cart.items.forEach { item ->
+            Log.d("CartRepositoryImpl", "Saved item: ${item.productName} (ID: ${item.productId}) - Quantity: ${item.quantity} - Price: ${item.productPrice}")
+        }
     }
     
     private fun loadCartFromLocal() {
@@ -35,6 +40,9 @@ class CartRepositoryImpl : CartRepository {
             cart.items.clear()
             cart.items.addAll(loadedCart.items)
             Log.d("CartRepositoryImpl", "Loaded ${cart.items.size} items from cart")
+            cart.items.forEach { item ->
+                Log.d("CartRepositoryImpl", "Loaded item: ${item.productName} (ID: ${item.productId}) - Quantity: ${item.quantity} - Price: ${item.productPrice}")
+            }
         } catch (e: Exception) {
             Log.e("CartRepositoryImpl", "Error loading cart: ${e.message}")
             cart.items.clear()
@@ -57,8 +65,8 @@ class CartRepositoryImpl : CartRepository {
             Log.d("CartRepositoryImpl", "Adding ${product.productName} to cart with quantity $quantity")
             Log.d("CartRepositoryImpl", "Cart before adding: ${cart.items.size} items")
             
-            // Use addOneItem to always add exactly one item regardless of quantity selected
-            cart.addOneItem(product)
+            // Add the product with the specified quantity
+            cart.addItem(product, quantity)
             
             Log.d("CartRepositoryImpl", "Cart after adding: ${cart.items.size} items")
             Log.d("CartRepositoryImpl", "Items in cart:")

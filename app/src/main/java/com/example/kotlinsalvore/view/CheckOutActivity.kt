@@ -112,6 +112,7 @@ fun CheckoutScreen() {
     
     // Convert cart items to the format expected by the UI
     val cartItems = cart.value.items.map { item ->
+        android.util.Log.d("CheckOutActivity", "Converting cart item: ${item.productName} (ID: ${item.productId}) with quantity: ${item.quantity}")
         CartItem(
             id = item.productId,
             name = item.productName,
@@ -119,6 +120,12 @@ fun CheckoutScreen() {
             image = R.drawable.image, // Default image
             quantity = item.quantity
         )
+    }
+    
+    // Debug: Log the final cart items
+    android.util.Log.d("CheckOutActivity", "Final cart items for UI: ${cartItems.size} items")
+    cartItems.forEachIndexed { index, item ->
+        android.util.Log.d("CheckOutActivity", "UI Item $index: ${item.name} - Quantity: ${item.quantity} - Price: $${item.price}")
     }
 
     var selectedDeliveryOption by remember { mutableStateOf("delivery") }
@@ -156,6 +163,26 @@ fun CheckoutScreen() {
                     containerColor = Color.White
                 ),
                 actions = {
+                    // Debug button to show cart contents
+                    IconButton(
+                        onClick = {
+                            android.util.Log.d("CheckOutActivity", "Cart debug - Raw cart items:")
+                            cart.value.items.forEachIndexed { index, item ->
+                                android.util.Log.d("CheckOutActivity", "Raw Item $index: ${item.productName} (ID: ${item.productId}) - Quantity: ${item.quantity}")
+                            }
+                            android.util.Log.d("CheckOutActivity", "Cart debug - UI cart items:")
+                            cartItems.forEachIndexed { index, item ->
+                                android.util.Log.d("CheckOutActivity", "UI Item $index: ${item.name} (ID: ${item.id}) - Quantity: ${item.quantity}")
+                            }
+                            android.widget.Toast.makeText(context, "Cart has ${cartItems.size} items. Check Logcat for details.", android.widget.Toast.LENGTH_LONG).show()
+                        }
+                    ) {
+                        Icon(
+                            Icons.Default.Search,
+                            contentDescription = "Debug Cart",
+                            tint = Color.Blue
+                        )
+                    }
                     if (cartItems.isNotEmpty()) {
                         IconButton(
                             onClick = {
