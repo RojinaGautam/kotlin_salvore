@@ -36,8 +36,10 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.kotlinsalvore.R
-import com.google.firebase.database.ktx.database
-import com.google.firebase.ktx.Firebase
+import com.example.kotlinsalvore.model.CartModel
+import com.example.kotlinsalvore.repository.CartRepositoryImpl
+import com.example.kotlinsalvore.viewmodel.CartViewModel
+import androidx.compose.runtime.livedata.observeAsState
 import android.widget.Toast // For displaying short messages
 
 data class CartItem(
@@ -93,18 +95,29 @@ fun CheckoutScreen() {
     val activity = context as? Activity
     val scrollState = rememberScrollState()
 
-    // Get a reference to the Firebase Realtime Database
-    val database = Firebase.database
-    val ordersRef = database.getReference("orders") // "orders" is the root node for your orders
-
-    // Sample cart items - in real app, this would come from your cart data
-    var cartItems by remember {
-        mutableStateOf(
-            listOf(
-                CartItem("1", "Grilled Salmon", 18.99, R.drawable.image, 2),
-                CartItem("2", "Pasta Carbonara", 14.50, R.drawable.image, 1),
-                CartItem("3", "Caesar Salad", 9.99, R.drawable.image, 1)
-            )
+    // Initialize cart repository and view model
+    val cartRepository = remember { 
+        CartRepositoryImpl().apply { setContext(context) }
+    }
+    val cartViewModel = remember { CartViewModel(cartRepository) }
+    
+    // Observe cart data
+    val cart = cartViewModel.cart.observeAsState(initial = CartModel())
+    val isLoading = cartViewModel.isLoading.observeAsState(initial = true)
+    
+    // Load cart when screen is displayed
+    LaunchedEffect(Unit) {
+        cartViewModel.loadCart()
+    }
+    
+    // Convert cart items to the format expected by the UI
+    val cartItems = cart.value.items.map { item ->
+        CartItem(
+            id = item.productId,
+            name = item.productName,
+            price = item.productPrice,
+            image = R.drawable.image, // Default image
+            quantity = item.quantity
         )
     }
 
@@ -141,7 +154,21 @@ fun CheckoutScreen() {
                 },
                 colors = TopAppBarDefaults.centerAlignedTopAppBarColors(
                     containerColor = Color.White
-                )
+                ),
+                actions = {
+                    IconButton(
+                        onClick = {
+                            cartViewModel.clearCart()
+                            Toast.makeText(context, "Cart cleared", Toast.LENGTH_SHORT).show()
+                        }
+                    ) {
+                        Icon(
+                            Icons.Default.Clear,
+                            contentDescription = "Clear Cart",
+                            tint = Color.Black
+                        )
+                    }
+                }
             )
         },
         bottomBar = {
@@ -166,52 +193,15 @@ fun CheckoutScreen() {
                         )
                         Button(
                             onClick = {
-                                // --- Firebase Integration: Handle Place Order ---
-                                val orderId = ordersRef.push().key // Generate a unique key for the order
-                                if (orderId != null) {
-                                    val cartItemsForFirebase = cartItems.map { item ->
-                                        // IMPORTANT: You cannot save R.drawable.image directly to Firebase.
-                                        // You need to save a URL to the image or a string identifier.
-                                        // For this example, I'm using a placeholder "image_placeholder_url"
-                                        // In a real app, you'd upload images to Firebase Storage and save the URL.
-                                        CartItemFirebase(
-                                            id = item.id,
-                                            name = item.name,
-                                            price = item.price,
-                                            imageUrl = "gs://salvorrestaurant.appspot.com/image.jpg", // Example: Replace with actual image URL
-                                            quantity = item.quantity
-                                        )
-                                    }
-
-                                    val newOrder = Order(
-                                        orderId = orderId,
-                                        userId = "user123", // Replace with actual user ID
-                                        cartItems = cartItemsForFirebase,
-                                        selectedDeliveryOption = selectedDeliveryOption,
-                                        selectedPaymentMethod = selectedPaymentMethod,
-                                        promoCodeApplied = promoCode,
-                                        isPromoApplied = isPromoApplied,
-                                        subtotal = subtotal,
-                                        deliveryFee = deliveryFee,
-                                        promoDiscount = promoDiscount,
-                                        tax = tax,
-                                        totalAmount = total,
-                                        orderTimestamp = System.currentTimeMillis()
-                                    )
-
-                                    ordersRef.child(orderId).setValue(newOrder)
-                                        .addOnSuccessListener {
-                                            Toast.makeText(context, "Order Placed Successfully!", Toast.LENGTH_SHORT).show()
-                                            // Optionally navigate to an order confirmation screen
-                                            activity?.finish() // Go back after successful order
-                                        }
-                                        .addOnFailureListener { e ->
-                                            Toast.makeText(context, "Failed to place order: ${e.message}", Toast.LENGTH_LONG).show()
-                                        }
-                                } else {
-                                    Toast.makeText(context, "Failed to generate order ID.", Toast.LENGTH_SHORT).show()
+                                if (cartItems.isEmpty()) {
+                                    Toast.makeText(context, "Your cart is empty!", Toast.LENGTH_SHORT).show()
+                                    return@Button
                                 }
-                                // --- End Firebase Integration ---
+                                
+                                // Clear the cart and show success message
+                                cartViewModel.clearCart()
+                                Toast.makeText(context, "Order Placed Successfully! Total: $${String.format("%.2f", total)}", Toast.LENGTH_LONG).show()
+                                activity?.finish() // Go back after successful order
                             },
                             modifier = Modifier
                                 .height(48.dp)
@@ -259,20 +249,45 @@ fun CheckoutScreen() {
 
                     Spacer(modifier = Modifier.height(16.dp))
 
-                    cartItems.forEachIndexed { index, item ->
-                        CartItemRow(
-                            item = item,
-                            onQuantityChange = { newQuantity ->
-                                cartItems = cartItems.toMutableList().apply {
-                                    this[index] = item.copy(quantity = newQuantity)
-                                }
-                            }
-                        )
-                        if (index < cartItems.size - 1) {
-                            Divider(
-                                modifier = Modifier.padding(vertical = 12.dp),
-                                color = Color(0xFFE5E7EB)
+                    if (isLoading.value) {
+                        Box(
+                            modifier = Modifier.fillMaxWidth(),
+                            contentAlignment = Alignment.Center
+                        ) {
+                            CircularProgressIndicator(
+                                color = Color(0xFFFF6B35),
+                                modifier = Modifier.padding(16.dp)
                             )
+                        }
+                    } else if (cartItems.isEmpty()) {
+                        Box(
+                            modifier = Modifier.fillMaxWidth(),
+                            contentAlignment = Alignment.Center
+                        ) {
+                            Text(
+                                text = "Your cart is empty",
+                                color = Color.Gray,
+                                fontSize = 16.sp
+                            )
+                        }
+                    } else {
+                        cartItems.forEachIndexed { index, item ->
+                            CartItemRow(
+                                item = item,
+                                onQuantityChange = { newQuantity ->
+                                    if (newQuantity <= 0) {
+                                        cartViewModel.removeFromCart(item.id)
+                                    } else {
+                                        cartViewModel.updateQuantity(item.id, newQuantity)
+                                    }
+                                }
+                            )
+                            if (index < cartItems.size - 1) {
+                                Divider(
+                                    modifier = Modifier.padding(vertical = 12.dp),
+                                    color = Color(0xFFE5E7EB)
+                                )
+                            }
                         }
                     }
                 }

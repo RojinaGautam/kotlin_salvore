@@ -50,7 +50,9 @@ fun UpdateProductBody() {
     var isLoading by remember { mutableStateOf(false) }
 
     val context = LocalContext.current
-    val repo = remember { ProductRepositoryImpl() }
+    val repo = remember { 
+        ProductRepositoryImpl().apply { setContext(context) }
+    }
     val viewModel = remember { ProductViewModel(repo) }
 
     val activity = context as? Activity

@@ -19,6 +19,7 @@ import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.Menu
 import androidx.compose.material.icons.filled.Person
+import androidx.compose.material.icons.filled.Refresh
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.runtime.livedata.observeAsState
@@ -53,6 +54,16 @@ class MenuActivity : ComponentActivity() {
             MenuScreen()
         }
     }
+    
+    override fun onResume() {
+        super.onResume()
+        // Refresh products when returning to this screen
+        android.util.Log.d("MenuActivity", "onResume called - refreshing products")
+        // Trigger a recomposition to refresh the data
+        setContent {
+            MenuScreen()
+        }
+    }
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -61,10 +72,13 @@ fun MenuScreen() {
     val context = LocalContext.current
     val activity = context as? Activity
 
+    // Use a key that changes when we need to refresh
+    var refreshKey by remember { mutableStateOf(0) }
 
-    val productRepository = remember { ProductRepositoryImpl() }
-    val context2 = LocalContext.current
-    val productViewModel = remember { ProductViewModel(productRepository) }
+    val productRepository = remember(refreshKey) { 
+        ProductRepositoryImpl().apply { setContext(context) }
+    }
+    val productViewModel = remember(refreshKey) { ProductViewModel(productRepository) }
     
     val allProducts = productViewModel.allProducts.observeAsState(initial = emptyList())
     val isLoading = productViewModel.isLoading.observeAsState(initial = true)
@@ -72,11 +86,16 @@ fun MenuScreen() {
     // Load products when the screen is first displayed
     LaunchedEffect(Unit) {
         productViewModel.getAllProduct()
+        // Debug: Check if products are loaded
+        android.util.Log.d("MenuActivity", "Loading products...")
     }
     
     // Refresh products when returning to this screen
-    LaunchedEffect(Unit) {
-        productViewModel.getAllProduct()
+    LaunchedEffect(refreshKey) {
+        if (refreshKey > 0) {
+            android.util.Log.d("MenuActivity", "Refreshing products due to refreshKey change")
+            productViewModel.getAllProduct()
+        }
     }
     
     // Fallback menu items if no products in database
@@ -90,6 +109,7 @@ fun MenuScreen() {
     
     // Use database products if available, otherwise use fallback
     val menuItems = if (allProducts.value.isNotEmpty()) {
+        android.util.Log.d("MenuActivity", "Using ${allProducts.value.size} products from database")
         allProducts.value.mapNotNull { product ->
             product?.let {
                 MenuItem(
@@ -102,6 +122,7 @@ fun MenuScreen() {
             }
         }
     } else {
+        android.util.Log.d("MenuActivity", "No products in database, using fallback items")
         fallbackMenuItems
     }
 
@@ -121,6 +142,20 @@ fun MenuScreen() {
                         Icon(
                             Icons.AutoMirrored.Filled.ArrowBack,
                             contentDescription = "Back",
+                            tint = Color.Black
+                        )
+                    }
+                },
+                actions = {
+                    IconButton(
+                        onClick = {
+                            android.util.Log.d("MenuActivity", "Manual refresh clicked")
+                            productViewModel.getAllProduct()
+                        }
+                    ) {
+                        Icon(
+                            Icons.Default.Refresh,
+                            contentDescription = "Refresh",
                             tint = Color.Black
                         )
                     }

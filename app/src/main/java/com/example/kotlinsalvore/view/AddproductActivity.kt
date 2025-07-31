@@ -55,7 +55,9 @@ fun AddProductScreen() {
     
     val categories = listOf("Seafood", "Appetizers", "Main Course", "Desserts", "Beverages")
 
-    val productRepository = remember { ProductRepositoryImpl() }
+    val productRepository = remember { 
+        ProductRepositoryImpl().apply { setContext(context) }
+    }
     val productViewModel = remember { ProductViewModel(productRepository) }
     
     Scaffold(
@@ -86,6 +88,11 @@ fun AddProductScreen() {
         floatingActionButton = {
             FloatingActionButton(
                 onClick = {
+                    android.util.Log.d("AddproductActivity", "Save button clicked")
+                    android.util.Log.d("AddproductActivity", "Product Name: $productName")
+                    android.util.Log.d("AddproductActivity", "Product Price: $productPrice")
+                    android.util.Log.d("AddproductActivity", "Product Description: $productDescription")
+                    
                     if (productName.isBlank() || productPrice.isBlank() || productDescription.isBlank()) {
                         Toast.makeText(context, "Please fill in all fields", Toast.LENGTH_SHORT).show()
                         return@FloatingActionButton
@@ -107,13 +114,16 @@ fun AddProductScreen() {
                         image = "" // TODO: Add image upload functionality
                     )
                     
+                    android.util.Log.d("AddproductActivity", "ProductModel created: ${productModel.productName}, ${productModel.productPrice}")
+                    
                     productViewModel.addProduct(productModel) { success, message ->
+                        android.util.Log.d("AddproductActivity", "AddProduct callback - Success: $success, Message: $message")
                         isLoading = false
                         if (success) {
-                            Toast.makeText(context, "Product added successfully!", Toast.LENGTH_SHORT).show()
+                            Toast.makeText(context, "Product added successfully! ID: ${productModel.productId}", Toast.LENGTH_LONG).show()
                             activity.finish()
                         } else {
-                            Toast.makeText(context, "Failed to add product: $message", Toast.LENGTH_SHORT).show()
+                            Toast.makeText(context, "Failed to add product: $message", Toast.LENGTH_LONG).show()
                         }
                     }
                 },

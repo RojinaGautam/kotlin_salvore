@@ -17,6 +17,7 @@ import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material.icons.filled.ShoppingCart
+import androidx.compose.material.icons.filled.Remove
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -31,6 +32,10 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.kotlinsalvore.R
+import com.example.kotlinsalvore.model.ProductModel
+import com.example.kotlinsalvore.repository.CartRepositoryImpl
+import com.example.kotlinsalvore.viewmodel.CartViewModel
+import android.widget.Toast
 
 
 class ProductDetailsActivity : ComponentActivity() {
@@ -70,6 +75,12 @@ fun ProductDetailsScreen(
     val activity = context as? Activity
     var quantity by remember { mutableIntStateOf(1) }
     val scrollState = rememberScrollState()
+    
+    // Initialize cart repository and view model
+    val cartRepository = remember { 
+        CartRepositoryImpl().apply { setContext(context) }
+    }
+    val cartViewModel = remember { CartViewModel(cartRepository) }
 
     Scaffold(
         topBar = {
@@ -128,7 +139,7 @@ fun ProductDetailsScreen(
                                 modifier = Modifier.size(32.dp)
                             ) {
                                 Icon(
-                                    Icons.Default.Search, // Consider changing this icon to something like Icons.Default.Remove
+                                    Icons.Default.Remove,
                                     contentDescription = "Decrease",
                                     tint = Color(0xFFFF6B35),
                                     modifier = Modifier.size(20.dp)
@@ -157,15 +168,27 @@ fun ProductDetailsScreen(
                     // Add to cart button
                     Button(
                         onClick = {
+                            // Debug: Log the quantity being added
+                            android.util.Log.d("ProductDetailActivity", "Adding to cart - Quantity: $quantity")
+                            
+                            // Create a ProductModel from the item data
+                            val price = itemPrice.replace("$", "").toDoubleOrNull() ?: 0.0
+                            val product = ProductModel(
+                                productId = itemId,
+                                productName = itemName,
+                                productPrice = price,
+                                productDesc = itemDescription,
+                                image = ""
+                            )
+                            
+                            // Add to cart
+                            cartViewModel.addToCart(product, quantity)
+                            
+                            // Show success message with quantity
+                            Toast.makeText(context, "$quantity x ${itemName} added to cart!", Toast.LENGTH_SHORT).show()
+                            
                             // Navigate to CheckOutActivity
-                            val intent = Intent(context, CheckoutActivity::class.java).apply {
-                                // Optionally pass data to CheckOutActivity
-                                putExtra("ITEM_ID", itemId)
-                                putExtra("ITEM_NAME", itemName)
-                                putExtra("ITEM_PRICE", itemPrice)
-                                putExtra("QUANTITY", quantity)
-                                // Add any other relevant item details
-                            }
+                            val intent = Intent(context, CheckoutActivity::class.java)
                             context.startActivity(intent)
                         },
                         modifier = Modifier

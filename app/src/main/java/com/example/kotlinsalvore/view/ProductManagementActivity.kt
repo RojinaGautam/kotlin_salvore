@@ -50,7 +50,9 @@ fun ProductManagementScreen() {
     val activity = context as? Activity
 
 
-    val productRepository = remember { ProductRepositoryImpl() }
+    val productRepository = remember { 
+        ProductRepositoryImpl().apply { setContext(context) }
+    }
     val productViewModel = remember { ProductViewModel(productRepository) }
     
     val allProducts = productViewModel.allProducts.observeAsState(initial = emptyList())
@@ -155,12 +157,12 @@ fun ProductManagementScreen() {
                 items(allProducts.value) { product ->
                     product?.let { ProductManagementCard(
                         product = it,
-                        onEdit = {
-                            val intent = Intent(context, UpdateProductActivity::class.java).apply {
-                                putExtra("productId", it.productId)
-                            }
-                            context.startActivity(intent)
-                        },
+                                                 onEdit = {
+                             val intent = Intent(context, UpdateProductActivity::class.java).apply {
+                                 putExtra("productId", it.productId)
+                             }
+                             context.startActivity(intent)
+                         },
                         onDelete = {
                             productToDelete = it
                             showDeleteDialog = true

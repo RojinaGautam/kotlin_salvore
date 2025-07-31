@@ -145,7 +145,7 @@
 
         <activity
 
-            android:name="com.example.kotlinsalvore.view.ForgetPasswordActivity"
+            android:name="com.example.kotlinsalvore.view.ForgotpasswordActivity"
 
             android:exported="true"
 

@@ -45,9 +45,14 @@ class ProductRepositoryImpl : ProductRepository {
     }
 
     private fun loadProductsFromLocal() {
+        Log.d("ProductRepositoryImpl", "loadProductsFromLocal called")
         val json = getSharedPreferences()?.getString(productsKey, "[]")
+        Log.d("ProductRepositoryImpl", "Loaded JSON from SharedPreferences: $json")
+        
         val type = object : TypeToken<List<ProductModel>>() {}.type
         val loadedProducts = gson.fromJson<List<ProductModel>>(json, type) ?: emptyList()
+        Log.d("ProductRepositoryImpl", "Parsed ${loadedProducts.size} products from JSON")
+        
         localProducts.clear()
         localProducts.addAll(loadedProducts)
         
@@ -57,6 +62,8 @@ class ProductRepositoryImpl : ProductRepository {
         } else {
             1
         }
+        
+        Log.d("ProductRepositoryImpl", "Next ID will be: $nextId")
     }
 
     override fun uploadImage(context: Context, imageUri: Uri, callback: (String?) -> Unit) {
@@ -114,19 +121,34 @@ class ProductRepositoryImpl : ProductRepository {
         callback: (Boolean, String) -> Unit
     ) {
         try {
+            Log.d("ProductRepositoryImpl", "addProduct called with: ${productModel.productName}")
+            
+            if (context == null) {
+                Log.e("ProductRepositoryImpl", "Context is null!")
+                callback(false, "Context is null. Please set context first.")
+                return
+            }
+            
+            Log.d("ProductRepositoryImpl", "Context is not null, proceeding...")
+            
             // Generate unique ID
             val id = nextId.toString()
             productModel.productId = id
             nextId++
             
+            Log.d("ProductRepositoryImpl", "Generated ID: $id")
+            
             // Add to local list
             localProducts.add(productModel)
+            Log.d("ProductRepositoryImpl", "Added to local list. Total products: ${localProducts.size}")
             
             // Save to local storage
             saveProductsToLocal()
+            Log.d("ProductRepositoryImpl", "Saved to local storage")
             
-            callback(true, "Product added successfully")
+            callback(true, "Product added successfully with ID: $id")
         } catch (e: Exception) {
+            Log.e("ProductRepositoryImpl", "Error adding product: ${e.message}", e)
             callback(false, "Failed to add product: ${e.message}")
         }
     }
@@ -168,10 +190,27 @@ class ProductRepositoryImpl : ProductRepository {
 
     override fun getAllProduct(callback: (Boolean, String, List<ProductModel?>) -> Unit) {
         try {
+            Log.d("ProductRepositoryImpl", "getAllProduct called")
+            
+            if (context == null) {
+                Log.e("ProductRepositoryImpl", "Context is null in getAllProduct!")
+                callback(false, "Context is null. Please set context first.", emptyList())
+                return
+            }
+            
+            Log.d("ProductRepositoryImpl", "Context is not null, loading products...")
             loadProductsFromLocal()
             val products = localProducts.map { it as ProductModel? }
-            callback(true, "Products loaded successfully", products)
+            Log.d("ProductRepositoryImpl", "Loaded ${products.size} products from local storage")
+            
+            // Log each product for debugging
+            products.forEachIndexed { index, product ->
+                Log.d("ProductRepositoryImpl", "Product $index: ${product?.productName} - $${product?.productPrice}")
+            }
+            
+            callback(true, "Products loaded successfully. Found ${products.size} products.", products)
         } catch (e: Exception) {
+            Log.e("ProductRepositoryImpl", "Error loading products: ${e.message}", e)
             callback(false, "Failed to load products: ${e.message}", emptyList())
         }
     }
@@ -209,5 +248,12 @@ class ProductRepositoryImpl : ProductRepository {
         } catch (e: Exception) {
             callback(false, "Failed to update product: ${e.message}")
         }
+    }
+    
+    fun setContext(context: Context) {
+        Log.d("ProductRepositoryImpl", "setContext called")
+        this.context = context
+        loadProductsFromLocal()
+        Log.d("ProductRepositoryImpl", "Context set and products loaded. Total products: ${localProducts.size}")
     }
 }
